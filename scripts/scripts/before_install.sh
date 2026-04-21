@@ -1,4 +1,4 @@
 #!/bin/bash
-# Detiene y elimina cualquier contenedor viejo que use el puerto 5000
+echo "Deteniendo contenedor anterior si existe..."
 docker stop mi-app-flask || true
 docker rm mi-app-flask || true
