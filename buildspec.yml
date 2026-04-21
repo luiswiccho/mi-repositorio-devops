@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "Instalando dependencias para pruebas..."
+      - pip install pytest flask
+  pre_build:
+    commands:
+      - echo "Iniciando fase pre-construcción..."
+      - echo "Iniciando sesión en Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+  build:
+    commands:
+      - echo "Ejecutando pruebas..."
+      - pytest tests/ -v
+      - echo "Construcción de la imagen Docker..."
+      - docker build -t mi-app-flask ./app
+      - docker tag mi-app-flask:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mi-repo-ecr:latest
+  post_build:
+    commands:
+      - echo "Construcción finalizada con éxito. Subiendo imagen a ECR..."
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mi-repo-ecr:latest
+      - echo "Generando artifact para CodeDeploy..."
+      - printf '[{"name":"web","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mi-repo-ecr:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - appspec.yml
+    - scripts/**/*
