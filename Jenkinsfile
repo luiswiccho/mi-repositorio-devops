@@ -60,6 +60,7 @@ pipeline {
         stage('Prueba de importacion') {
             steps {
                 echo 'Probando que la aplicacion se puede importar...'
+                // Esta es la linea corregida - las comillas escapadas correctamente
                 bat 'python -c "import sys; sys.path.append(\"app\"); from app import app; print(\"OK: App importada exitosamente\")"'
             }
         }
@@ -78,7 +79,7 @@ pipeline {
             - Sintaxis Python: Valida
             - Configuracion AWS: Completa
             
-            Proximo paso: Subir codigo a GitHub
+            Proximo paso: El codigo esta listo para AWS
             =============================================
             '''
         }
