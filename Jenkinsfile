@@ -4,42 +4,40 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/luiswiccho/mi-repositorio-devops.git'
+                git branch: 'main', 
+                    url: 'https://github.com/luiswiccho/mi-repositorio-devops.git',
+                    credentialsId: 'github-pat'
             }
         }
 
         stage('Instalar dependencias') {
             steps {
-                sh 'pip install -r app/requirements.txt'
+                // Para Windows usa 'bat' en lugar de 'sh'
+                bat 'pip install -r app/requirements.txt'
             }
         }
 
         stage('Ejecutar pruebas') {
             steps {
-                sh 'python -m pytest tests/'
+                bat 'python -m pytest tests/ -v'
             }
         }
 
-
-        stage('Construir imagen Docker') {
+        stage('Preparar artefactos para AWS') {
             steps {
-                sh 'docker build -t mi-app-flask ./app'
-            }
-        }
-
-        stage('Despliegue con Docker Compose') {
-            steps {
-                sh 'docker-compose up -d'
+                echo '✅ Código validado y listo para AWS CodePipeline'
+                echo '📦 AWS CodeBuild construirá la imagen Docker'
+                echo '🚀 AWS CodeDeploy desplegará la aplicación'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline ejecutado con éxito 🚀'
+            echo '✅ Pipeline ejecutado con éxito - Código listo para AWS'
         }
         failure {
-            echo 'Pipeline falló ❌'
+            echo '❌ Pipeline falló - Revisa los logs'
         }
     }
 }
