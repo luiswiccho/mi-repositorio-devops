@@ -15,10 +15,11 @@ pipeline {
         }
 
         stage('Ejecutar pruebas') {
-            steps {
-                sh 'pytest tests/'
-            }
-        }
+    steps {
+        sh 'python -m pytest tests/'
+    }
+}
+
 
         stage('Construir imagen Docker') {
             steps {
